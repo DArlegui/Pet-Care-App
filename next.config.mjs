@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'bytegrad.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn3.iconfinder.com',
+      },
     ],
   },
 };
