@@ -1,18 +1,13 @@
+'use client';
+import { usePetContext } from '@/lib/hooks';
 import Image from 'next/image';
 
-interface PetProps {
-  id: string;
-  name: string;
-  ownerName: string;
-  imageUrl: string;
-  age: 2;
-  notes: string;
-}
+export default function PetList() {
+  const { pets } = usePetContext();
 
-export default function PetList({ pets }: any) {
   return (
     <ul className="bg-white border-b border-black/[0.08]">
-      {pets.map((pet: PetProps) => (
+      {pets.map((pet) => (
         <li key={pet.id}>
           <button className="flex items-center h-[70px] w-full cursor-pointer px-5 text-base gap-3 hover:bg-[#EFF1F2] transition">
             <Image
