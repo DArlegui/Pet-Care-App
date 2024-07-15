@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'cdn3.iconfinder.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 };
