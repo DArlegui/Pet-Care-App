@@ -26,7 +26,7 @@ export default function PetContextProvider({ data, children }: PetContextProvide
 
   //event handlers
   const handleChangeSelectedPetId = (id: string) => {
-    setSelectedPetId(id);
+    setSelectedPetId((prevId) => (prevId === id ? null : id));
   };
 
   return (
