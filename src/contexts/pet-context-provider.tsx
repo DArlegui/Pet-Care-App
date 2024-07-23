@@ -11,6 +11,7 @@ interface TPetContext {
   pets: PetProps[];
   selectedPetId: string | null;
   selectedPet: PetProps | undefined;
+  numberOfPets: number;
   handleChangeSelectedPetId: (id: string) => void;
 }
 
@@ -23,6 +24,7 @@ export default function PetContextProvider({ data, children }: PetContextProvide
 
   //derived state
   const selectedPet = pets.find((pet) => pet.id === selectedPetId);
+  const numberOfPets = pets.length;
 
   //event handlers
   const handleChangeSelectedPetId = (id: string) => {
@@ -30,7 +32,7 @@ export default function PetContextProvider({ data, children }: PetContextProvide
   };
 
   return (
-    <PetContext.Provider value={{ pets, selectedPetId, selectedPet, handleChangeSelectedPetId }}>
+    <PetContext.Provider value={{ pets, selectedPetId, selectedPet, numberOfPets, handleChangeSelectedPetId }}>
       {children}
     </PetContext.Provider>
   );
