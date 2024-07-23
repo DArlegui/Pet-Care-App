@@ -1,6 +1,6 @@
 'use client';
-import { createContext, useState } from 'react';
 import { PetProps } from '@/lib/types';
+import { createContext, useState } from 'react';
 
 interface PetContextProviderProps {
   data: PetProps[];
@@ -12,6 +12,7 @@ interface TPetContext {
   selectedPetId: string | null;
   selectedPet: PetProps | undefined;
   numberOfPets: number;
+  handleCheckoutPet: (id: string) => void;
   handleChangeSelectedPetId: (id: string) => void;
 }
 
@@ -27,12 +28,15 @@ export default function PetContextProvider({ data, children }: PetContextProvide
   const numberOfPets = pets.length;
 
   //event handlers
-  const handleChangeSelectedPetId = (id: string) => {
-    setSelectedPetId((prevId) => (prevId === id ? null : id));
+  const handleCheckoutPet = (id: string) => {
+    setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
+    setSelectedPetId(null);
   };
+  const handleChangeSelectedPetId = (id: string) => setSelectedPetId((prevId) => (prevId === id ? null : id));
 
   return (
-    <PetContext.Provider value={{ pets, selectedPetId, selectedPet, numberOfPets, handleChangeSelectedPetId }}>
+    <PetContext.Provider
+      value={{ pets, selectedPetId, selectedPet, numberOfPets, handleCheckoutPet, handleChangeSelectedPetId }}>
       {children}
     </PetContext.Provider>
   );
