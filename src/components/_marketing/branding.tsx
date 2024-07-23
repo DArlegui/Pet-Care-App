@@ -1,4 +1,4 @@
-import H1 from '@/components/h1';
+import H1 from '@/components/_marketing/h1';
 
 export default function Branding() {
   return (

@@ -1,4 +1,4 @@
-import Branding from '@/components/_dashboard/branding';
+import Branding from '@/components/_marketing/branding';
 import ContentBlock from '@/components/_dashboard/content-block';
 import PetDetails from '@/components/_dashboard/pet-details';
 import PetList from '@/components/_dashboard/pet-list';
