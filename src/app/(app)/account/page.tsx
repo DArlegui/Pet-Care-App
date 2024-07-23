@@ -1,5 +1,14 @@
-import React from 'react';
+import ContentBlock from '@/components/_dashboard/content-block';
+import H1 from '@/components/_marketing/h1';
 
 export default function Account() {
-  return <div>AccountPage</div>;
+  return (
+    <main>
+      <H1 className="my-8 text-white">Your Account</H1>
+
+      <ContentBlock className="h-[500px] flex justify-center items-center">
+        <p className="text-lg">Logged in as...</p>
+      </ContentBlock>
+    </main>
+  );
 }
