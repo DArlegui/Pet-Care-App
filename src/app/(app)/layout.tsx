@@ -1,6 +1,6 @@
-import AppFooter from '@/components/app-footer';
-import AppHeader from '@/components/app-header';
-import BackgroundPattern from '@/components/background-pattern';
+import AppFooter from '@/components/_root/app-footer';
+import AppHeader from '@/components/_root/app-header';
+import BackgroundPattern from '@/components/_root/background-pattern';
 import PetContextProvider from '@/contexts/pet-context-provider';
 import SearchContextProvider from '@/contexts/search-context-provider';
 import { PetProps } from '@/lib/types';
@@ -9,9 +9,7 @@ import React from 'react';
 export default async function layout({ children }: { children: React.ReactNode }) {
   const response = await fetch('https://bytegrad.com/course-assets/projects/petsoft/api/pets');
 
-  if (!response) {
-    throw new Error('Failed to fetch pets');
-  }
+  if (!response) throw new Error('Failed to fetch pets');
 
   const data: PetProps[] = await response.json();
 

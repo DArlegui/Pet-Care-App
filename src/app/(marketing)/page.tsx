@@ -3,7 +3,7 @@ import { PawPrint } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import logo from '../../../public/logo.svg';
-import Logo from '@/components/logo';
+import Logo from '@/components/_root/logo';
 
 export default function Home() {
   return (
