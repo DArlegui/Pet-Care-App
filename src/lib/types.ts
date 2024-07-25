@@ -3,6 +3,6 @@ export interface PetProps {
   name: string;
   ownerName: string;
   imageUrl: string;
-  age: 2;
+  age: number;
   notes: string;
 }
