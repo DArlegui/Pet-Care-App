@@ -13,6 +13,7 @@ interface TPetContext {
   selectedPet: PetProps | undefined;
   numberOfPets: number;
   handleAddPet: (newPet: Omit<PetProps, 'id'>) => void;
+  handleEditPet: (petId: string, updatedPet: Omit<PetProps, 'id'>) => void;
   handleCheckoutPet: (id: string) => void;
   handleChangeSelectedPetId: (id: string) => void;
 }
@@ -38,6 +39,21 @@ export default function PetContextProvider({ data, children }: PetContextProvide
       },
     ]);
   };
+
+  const handleEditPet = (petId: string, updatedPet: Omit<PetProps, 'id'>) => {
+    setPets((prevPets) =>
+      prevPets.map((pet) => {
+        if (pet.id === petId) {
+          return {
+            id: petId,
+            ...updatedPet,
+          };
+        }
+        return pet;
+      })
+    );
+  };
+
   const handleCheckoutPet = (id: string) => {
     setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
     setSelectedPetId(null);
@@ -55,6 +71,7 @@ export default function PetContextProvider({ data, children }: PetContextProvide
         numberOfPets,
         //event handlers
         handleAddPet,
+        handleEditPet,
         handleCheckoutPet,
         handleChangeSelectedPetId,
       }}>

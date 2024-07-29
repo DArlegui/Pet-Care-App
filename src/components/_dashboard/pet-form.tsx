@@ -11,13 +11,13 @@ interface PetFormProps {
 }
 
 export default function PetForm({ actionType, onFormSubmission }: PetFormProps) {
-  const { handleAddPet, selectedPet } = usePetContext();
+  const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     // const newPet = Object.fromEntries(formData.entries());
-    const newPet = {
+    const pet = {
       // id: ,
       name: formData.get('name') as string,
       ownerName: formData.get('ownerName') as string,
@@ -27,8 +27,9 @@ export default function PetForm({ actionType, onFormSubmission }: PetFormProps) 
       age: +(formData.get('age') as string),
       notes: formData.get('notes') as string,
     };
+    if (actionType === 'add') handleAddPet(pet);
+    else if (actionType === 'edit') handleEditPet(selectedPet!.id, pet);
 
-    handleAddPet(newPet);
     onFormSubmission();
   };
 
