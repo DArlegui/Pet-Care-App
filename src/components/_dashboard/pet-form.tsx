@@ -1,9 +1,11 @@
 'use client';
-import { usePetContext } from '@/lib/hooks';
-import { Button } from '@/components/ui/button';
+import { addPet } from '@/actions/actions';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { usePetContext } from '@/lib/hooks';
+import { toast } from 'sonner';
+import PetFormBtn from './pet-form-btn';
 
 interface PetFormProps {
   actionType: 'add' | 'edit';
@@ -11,30 +13,19 @@ interface PetFormProps {
 }
 
 export default function PetForm({ actionType, onFormSubmission }: PetFormProps) {
-  const { handleAddPet, handleEditPet, selectedPet } = usePetContext();
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    // const newPet = Object.fromEntries(formData.entries());
-    const pet = {
-      // id: ,
-      name: formData.get('name') as string,
-      ownerName: formData.get('ownerName') as string,
-      imageUrl:
-        (formData.get('imageUrl') as string) ||
-        'https://cdn3.iconfinder.com/data/icons/essential-demo/32/cat_dog_animal_paw-256.png',
-      age: +(formData.get('age') as string),
-      notes: formData.get('notes') as string,
-    };
-    if (actionType === 'add') handleAddPet(pet);
-    else if (actionType === 'edit') handleEditPet(selectedPet!.id, pet);
-
-    onFormSubmission();
-  };
+  const { selectedPet } = usePetContext();
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
+    <form
+      action={async (formData) => {
+        const error = await addPet(formData);
+        if (error) {
+          toast.warning(error.message);
+          return;
+        }
+        onFormSubmission();
+      }}
+      className="flex flex-col">
       <div className="space-y-3">
         <div className="space-y-1">
           <Label htmlFor="name">Name</Label>
@@ -88,9 +79,7 @@ export default function PetForm({ actionType, onFormSubmission }: PetFormProps) 
         </div>
       </div>
 
-      <Button type="submit" className="mt-4 self-center">
-        {actionType === 'add' ? 'Add Pet' : 'Submit Changes'}
-      </Button>
+      <PetFormBtn actionType={actionType} />
     </form>
   );
 }
