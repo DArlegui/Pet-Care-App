@@ -31,3 +31,30 @@ export async function addPet(formData: any) {
 
   revalidatePath('/app', 'layout');
 }
+
+export async function editPet(petId: string, formData: any) {
+  await sleep(2000);
+
+  try {
+    await prisma.pet.update({
+      where: {
+        id: petId,
+      },
+      data: {
+        name: formData.get('name'),
+        ownerName: formData.get('ownerName'),
+        age: parseInt(formData.get('age')),
+        imageUrl:
+          formData.get('imageUrl') ||
+          'https://cdn3.iconfinder.com/data/icons/essential-demo/32/cat_dog_animal_paw-256.png',
+        notes: formData.get('notes'),
+      },
+    });
+  } catch (error) {
+    return {
+      message: "Couldn't edit pet",
+    };
+  }
+
+  revalidatePath('/app', 'layout');
+}
