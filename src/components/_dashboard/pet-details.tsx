@@ -1,4 +1,5 @@
 'use client';
+import { deletePet } from '@/actions/actions';
 import { usePetContext } from '@/lib/hooks';
 import { PetProps } from '@/lib/types';
 import Image from 'next/image';
@@ -31,8 +32,6 @@ function EmptyView() {
 }
 
 function TopBar({ pet }: { pet: PetProps }) {
-  const { handleCheckoutPet } = usePetContext();
-
   return (
     <div className="flex items-center bg-white px-8 p-5 border-b-1 border-light">
       <Image
@@ -45,7 +44,7 @@ function TopBar({ pet }: { pet: PetProps }) {
       <h2 className="text-3xl font-semibold leading-7 ml-5">{pet?.name}</h2>
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
-        <PetButton actionType="checkout" onClick={() => handleCheckoutPet(pet.id)}>
+        <PetButton actionType="checkout" onClick={async () => await deletePet(pet.id)}>
           Checkout
         </PetButton>
       </div>
