@@ -1,12 +1,12 @@
 'use client';
-import { deletePet } from '@/actions/actions';
 import { usePetContext } from '@/lib/hooks';
 import { PetProps } from '@/lib/types';
 import Image from 'next/image';
+import { useTransition } from 'react';
 import PetButton from './pet-button';
 
 export default function PetDetails() {
-  const { selectedPet } = usePetContext();
+  const { selectedPet, handleCheckoutPet } = usePetContext();
 
   return (
     <section className="flex flex-col h-full w-full">
@@ -32,6 +32,9 @@ function EmptyView() {
 }
 
 function TopBar({ pet }: { pet: PetProps }) {
+  const [isPending, startTransition] = useTransition();
+  const { handleCheckoutPet } = usePetContext();
+
   return (
     <div className="flex items-center bg-white px-8 p-5 border-b-1 border-light">
       <Image
@@ -41,10 +44,10 @@ function TopBar({ pet }: { pet: PetProps }) {
         width={75}
         className="h-[75px] w-[75px] rounded-full object-cover"
       />
-      <h2 className="text-3xl font-semibold leading-7 ml-5">{pet?.name}</h2>
+      <h2 className="text-3xl font-semibold leading-7 ml-5">{pet.name}</h2>
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
-        <PetButton actionType="checkout" onClick={async () => await deletePet(pet.id)}>
+        <PetButton actionType="checkout" disabled={isPending} onClick={async () => await handleCheckoutPet(pet.id)}>
           Checkout
         </PetButton>
       </div>
