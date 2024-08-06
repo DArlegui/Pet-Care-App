@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { usePetContext } from '@/lib/hooks';
-import { PetProps } from '@/lib/types';
+import { PetEssentials } from '@/lib/types';
 import PetFormBtn from './pet-form-btn';
 
 interface PetFormProps {
@@ -18,7 +18,7 @@ export default function PetForm({ actionType, onFormSubmission }: PetFormProps) 
     <form
       action={async (formData) => {
         onFormSubmission();
-        const petData: Omit<PetProps, 'id'> = {
+        const petData: PetEssentials = {
           name: formData.get('name') as string,
           ownerName: formData.get('ownerName') as string,
           imageUrl:

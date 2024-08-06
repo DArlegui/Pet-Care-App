@@ -1,12 +1,11 @@
 'use client';
 import { usePetContext } from '@/lib/hooks';
-import { PetProps } from '@/lib/types';
+import { Pet } from '@prisma/client';
 import Image from 'next/image';
-import { useTransition } from 'react';
 import PetButton from './pet-button';
 
 export default function PetDetails() {
-  const { selectedPet, handleCheckoutPet } = usePetContext();
+  const { selectedPet } = usePetContext();
 
   return (
     <section className="flex flex-col h-full w-full">
@@ -31,23 +30,16 @@ function EmptyView() {
   );
 }
 
-function TopBar({ pet }: { pet: PetProps }) {
-  const [isPending, startTransition] = useTransition();
+function TopBar({ pet }: { pet: Pet }) {
   const { handleCheckoutPet } = usePetContext();
 
   return (
     <div className="flex items-center bg-white px-8 p-5 border-b-1 border-light">
-      <Image
-        src={pet?.imageUrl!}
-        alt=""
-        height={75}
-        width={75}
-        className="h-[75px] w-[75px] rounded-full object-cover"
-      />
+      <Image src={pet.imageUrl} alt="" height={75} width={75} className="h-[75px] w-[75px] rounded-full object-cover" />
       <h2 className="text-3xl font-semibold leading-7 ml-5">{pet.name}</h2>
       <div className="ml-auto space-x-2">
         <PetButton actionType="edit">Edit</PetButton>
-        <PetButton actionType="checkout" disabled={isPending} onClick={async () => await handleCheckoutPet(pet.id)}>
+        <PetButton actionType="checkout" onClick={async () => await handleCheckoutPet(pet.id)}>
           Checkout
         </PetButton>
       </div>
@@ -55,26 +47,26 @@ function TopBar({ pet }: { pet: PetProps }) {
   );
 }
 
-function Info({ pet }: { pet: PetProps }) {
+function Info({ pet }: { pet: Pet }) {
   return (
     <div className="flex justify-around py-10 px-5 text-center">
       <div>
         <h3 className="text-[13px] font-medium uppercase text-zinc-700">Owner Name</h3>
-        <p className="mt-1 text-lg text-zinc-800">{pet?.ownerName}</p>
+        <p className="mt-1 text-lg text-zinc-800">{pet.ownerName}</p>
       </div>
       <div>
         <h3 className="text-[13px] font-medium uppercase text-zinc-700">Age</h3>
-        <p className="mt-1 text-lg text-zinc-800">{pet?.age}</p>
+        <p className="mt-1 text-lg text-zinc-800">{pet.age}</p>
       </div>
     </div>
   );
 }
 
-function Notes({ pet }: { pet: PetProps }) {
+function Notes({ pet }: { pet: Pet }) {
   return (
     <section className="flex-1 bg-white px-7 py-5 rounded-md mb-9 mx-8 border border-light">
       <h3 className="text-[13px] font-medium uppercase text-zinc-700">Notes:</h3>
-      <p className="mt-1 text-lg text-zinc-800">{pet?.notes}</p>
+      <p className="mt-1 text-lg text-zinc-800">{pet.notes}</p>
     </section>
   );
 }
