@@ -24,13 +24,16 @@ export default function PetForm({ actionType, onFormSubmission }: PetFormProps) 
     formState: { errors },
   } = useForm<TPetForm>({
     resolver: zodResolver(petFormSchema),
-    defaultValues: {
-      name: actionType == 'edit' ? selectedPet?.name : '',
-      ownerName: actionType == 'edit' ? selectedPet?.ownerName : '',
-      imageUrl: actionType == 'edit' ? selectedPet?.imageUrl : '',
-      age: actionType == 'edit' ? Number(selectedPet?.age) : 0,
-      notes: actionType == 'edit' ? selectedPet?.notes : '',
-    },
+    defaultValues:
+      actionType === 'edit'
+        ? {
+            name: actionType == 'edit' ? selectedPet?.name : '',
+            ownerName: actionType == 'edit' ? selectedPet?.ownerName : '',
+            imageUrl: actionType == 'edit' ? selectedPet?.imageUrl : '',
+            age: actionType == 'edit' ? Number(selectedPet?.age) : 0,
+            notes: actionType == 'edit' ? selectedPet?.notes : '',
+          }
+        : undefined,
   });
 
   return (
