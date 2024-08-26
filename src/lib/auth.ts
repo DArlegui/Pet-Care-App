@@ -51,9 +51,11 @@ const config = {
         return true;
       }
 
-      if (!isTryingToAccessApp) {
-        return true;
+      if (isLoggedIn && !isTryingToAccessApp) {
+        return Response.redirect(new URL('/dashboard', request.nextUrl.origin).toString());
       }
+
+      return false;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
