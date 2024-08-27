@@ -24,7 +24,7 @@ const config = {
           return null;
         }
 
-        const passwordsMatch = bcrypt.compare(password, user.password);
+        const passwordsMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordsMatch) {
           console.log('Invalid credentials');
@@ -40,8 +40,11 @@ const config = {
     authorized: ({ auth, request }) => {
       // runs on every request with middleware
       const isLoggedIn = Boolean(auth?.user);
-      const paths = ['/app', '/dashboard', '/account'];
-      const isTryingToAccessApp = paths.some((path) => request.nextUrl.pathname.includes(path));
+      const appPaths = ['/dashboard', '/account'];
+      const publicPaths = ['/signup', '/login'];
+
+      const isTryingToAccessApp = appPaths.some((path) => request.nextUrl.pathname.includes(path));
+      const isTryingToAccessPublic = publicPaths.some((path) => request.nextUrl.pathname.includes(path));
 
       if (!isLoggedIn && isTryingToAccessApp) {
         return false;
@@ -51,11 +54,15 @@ const config = {
         return true;
       }
 
-      if (isLoggedIn && !isTryingToAccessApp) {
+      if (!isLoggedIn && isTryingToAccessPublic) {
+        return true;
+      }
+
+      if (isLoggedIn && !isTryingToAccessApp && isTryingToAccessPublic) {
         return Response.redirect(new URL('/dashboard', request.nextUrl.origin).toString());
       }
 
-      return false;
+      return true;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

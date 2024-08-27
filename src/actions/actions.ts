@@ -3,13 +3,44 @@ import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { sleep } from '@/lib/utils';
 import { petFormSchema, petIdSchema } from '@/lib/validations';
+import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 // -- User Actions --
 export async function logIn(formData: FormData) {
   const authData = Object.fromEntries(formData.entries());
 
   await signIn('credentials', authData);
+}
+
+export async function signUp(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  // Check if email already exists
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (existingUser) {
+    // Handle case where email already exists
+    throw new Error('A user with this email already exists.');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  // Redirect to login page after successful signup
+  redirect('/login');
 }
 
 export async function logOut() {
