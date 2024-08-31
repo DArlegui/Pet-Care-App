@@ -11,7 +11,7 @@ const config = {
     Credentials({
       async authorize(credentials) {
         // runs on login
-        const { email, password } = credentials;
+        const { email, password } = credentials as { email: string; password: string };
 
         const user = await prisma.user.findUnique({
           where: {
@@ -63,6 +63,20 @@ const config = {
       }
 
       return true;
+    },
+    jwt: ({ token, user }) => {
+      if (user) {
+        //on sign in
+        token.userId = user.id!;
+      }
+
+      return token;
+    },
+    session: ({ session, token }) => {
+      if (session.user) {
+        session.user.id = token.userId;
+      }
+      return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
