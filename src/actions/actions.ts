@@ -1,6 +1,7 @@
 'use server';
-import { auth, signIn, signOut } from '@/lib/auth';
+import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
+import { checkAuth } from '@/lib/server-utils';
 import { sleep } from '@/lib/utils';
 import { petFormSchema, petIdSchema } from '@/lib/validations';
 import bcrypt from 'bcryptjs';
@@ -20,9 +21,7 @@ export async function signUp(formData: FormData) {
 
   // Check if email already exists
   const existingUser = await prisma.user.findUnique({
-    where: {
-      email,
-    },
+    where: { email },
   });
 
   if (existingUser) {
@@ -54,8 +53,7 @@ export async function logOut() {
 export async function addPet(pet: unknown) {
   await sleep(1000);
 
-  const session = await auth();
-  if (!session?.user) return redirect('/login');
+  const session = await checkAuth();
 
   const validatedPet = petFormSchema.safeParse(pet);
 
@@ -63,7 +61,14 @@ export async function addPet(pet: unknown) {
 
   try {
     await prisma.pet.create({
-      data: { ...validatedPet.data, user: { connect: { id: session.user.id } } },
+      data: {
+        ...validatedPet.data,
+        user: {
+          connect: {
+            id: session.user.id,
+          },
+        },
+      },
     });
   } catch (error) {
     return { message: "Couldn't add pet" };
@@ -76,8 +81,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
   await sleep(1000);
 
   // authentication check
-  const session = await auth();
-  if (!session?.user) return redirect('/login');
+  const session = await checkAuth();
 
   // validation
   const validatedPetId = petIdSchema.safeParse(petId);
@@ -112,8 +116,7 @@ export async function deletePet(petId: unknown) {
   await sleep(1000);
 
   // authenticaiton check
-  const session = await auth();
-  if (!session?.user) return redirect('/login');
+  const session = await checkAuth();
 
   // validation
   const validatedPetId = petIdSchema.safeParse(petId);

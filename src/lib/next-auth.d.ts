@@ -1,4 +1,13 @@
-import { JWT } from '@auth/core/jwt';
+import { User } from 'next-auth';
+
+declare module 'next-auth' {
+  interface Session {
+    user: User & {
+      id: string;
+      email: string;
+    };
+  }
+}
 
 declare module '@auth/core/jwt' {
   interface JWT {

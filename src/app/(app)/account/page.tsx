@@ -1,15 +1,10 @@
 import ContentBlock from '@/components/_dashboard/content-block';
 import SignOutBtn from '@/components/_dashboard/sign-out-btn';
 import H1 from '@/components/_marketing/h1';
-import { auth, signOut } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+import { checkAuth } from '@/lib/server-utils';
 
 export default async function Account() {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect('/login');
-  }
+  const session = await checkAuth();
 
   return (
     <main>
