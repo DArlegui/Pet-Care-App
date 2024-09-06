@@ -1,7 +1,7 @@
 'use server';
 import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
-import { checkAuth } from '@/lib/server-utils';
+import { checkAuth, getPetById, getUserByEmail } from '@/lib/server-utils';
 import { sleep } from '@/lib/utils';
 import { petFormSchema, petIdSchema } from '@/lib/validations';
 import bcrypt from 'bcryptjs';
@@ -20,9 +20,7 @@ export async function signUp(formData: FormData) {
   const password = formData.get('password') as string;
 
   // Check if email already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
+  const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
     // Handle case where email already exists
@@ -63,7 +61,7 @@ export async function addPet(pet: unknown) {
     await prisma.pet.create({
       data: {
         ...validatedPet.data,
-        user: {
+        User: {
           connect: {
             id: session.user.id,
           },
@@ -92,10 +90,7 @@ export async function editPet(petId: unknown, newPetData: unknown) {
   }
 
   //authorization check (user own's pet)
-  const pet = await prisma.pet.findUnique({
-    where: { id: validatedPetId.data },
-    select: { userId: true },
-  });
+  const pet = await getPetById(validatedPetId.data);
 
   if (!pet) return { message: 'Pet not found' };
   if (pet.userId !== session.user.id) return { message: 'Unauthorized' };
@@ -123,10 +118,8 @@ export async function deletePet(petId: unknown) {
   if (!validatedPetId.success) return { message: 'Invalid pet ID' };
 
   // authorization check (user own's pet)
-  const pet = await prisma.pet.findUnique({
-    where: { id: validatedPetId.data },
-    select: { userId: true },
-  });
+  const pet = await getPetById(validatedPetId.data);
+
   if (!pet || pet.userId !== session.user.id) {
     return { message: 'Unauthorized' };
   }
