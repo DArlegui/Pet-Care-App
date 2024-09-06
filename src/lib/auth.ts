@@ -1,7 +1,7 @@
+import { authSchema } from '@/lib/validations';
 import Credentials from '@auth/core/providers/credentials';
 import bcrypt from 'bcryptjs';
 import NextAuth, { NextAuthConfig } from 'next-auth';
-import prisma from './db';
 import { getUserByEmail } from './server-utils';
 
 const config = {
@@ -12,7 +12,13 @@ const config = {
     Credentials({
       async authorize(credentials) {
         // runs on login
-        const { email, password } = credentials as { email: string; password: string };
+
+        //validations
+        const validatedFormData = authSchema.safeParse(credentials);
+        if (!validatedFormData.success) return null;
+
+        // extract values
+        const { email, password } = validatedFormData.data;
 
         const user = await getUserByEmail(email);
 
@@ -79,4 +85,9 @@ const config = {
   secret: process.env.NEXTAUTH_SECRET,
 } satisfies NextAuthConfig;
 
-export const { auth, signIn, signOut } = NextAuth(config);
+export const {
+  auth,
+  signIn,
+  signOut,
+  handlers: { GET, POST },
+} = NextAuth(config);
