@@ -20,9 +20,22 @@ export async function logIn(formData: unknown) {
   redirect('/dashboard');
 }
 
-export async function signUp(formData: FormData) {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+export async function signUp(formData: unknown) {
+  //check if formData is a FormData type
+  if (!(formData instanceof FormData)) {
+    return { message: 'Invalid form data' };
+  }
+
+  //convert FormData to a plain object
+  const formDataEntries = Object.fromEntries(formData.entries());
+
+  //Validates type
+  const validatedFormData = authSchema.safeParse(formDataEntries);
+  if (!validatedFormData.success) return { message: 'Invalid form data' };
+
+  //Extract email and password, hashes password
+  const { email, password } = validatedFormData.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   // Check if email already exists
   const existingUser = await getUserByEmail(email);
@@ -31,8 +44,6 @@ export async function signUp(formData: FormData) {
     // Handle case where email already exists
     throw new Error('A user with this email already exists.');
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
     data: {
