@@ -1,26 +1,46 @@
 'use server';
 import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
-import { checkAuth, getPetById, getUserByEmail } from '@/lib/server-utils';
+import { checkAuth, getPetById } from '@/lib/server-utils';
 import { sleep } from '@/lib/utils';
 import { authSchema, petFormSchema, petIdSchema } from '@/lib/validations';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 // -- User Actions --
-export async function logIn(formData: unknown) {
+export async function logIn(prevState: unknown, formData: unknown) {
+  await sleep(1000);
+
   //Check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return { message: 'Invalid form data' };
   }
 
-  //Validates through auth.ts
-  await signIn('credentials', formData);
+  try {
+    //Validates through auth.ts
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return { message: 'Invalid credentials' };
+        default:
+          return { message: 'An error occurred' };
+      }
+    }
+
+    return { message: 'An error occurred' };
+  }
+
   redirect('/dashboard');
 }
 
-export async function signUp(formData: unknown) {
+export async function signUp(prevState: unknown, formData: unknown) {
+  await sleep(1000);
+
   //check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return { message: 'Invalid form data' };
@@ -37,20 +57,30 @@ export async function signUp(formData: unknown) {
   const { email, password } = validatedFormData.data;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Check if email already exists
-  const existingUser = await getUserByEmail(email);
+  // // Check if email already exists
+  // const existingUser = await getUserByEmail(email);
 
-  if (existingUser) {
-    // Handle case where email already exists
-    throw new Error('A user with this email already exists.');
+  // if (existingUser) {
+  //   // Handle case where email already exists
+  //   throw new Error('A user with this email already exists.');
+  // }
+
+  try {
+    await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return { message: 'Email already exists' };
+      }
+    }
+
+    return { message: "Couldn't create user" };
   }
-
-  await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-    },
-  });
 
   // Redirect to login page after successful signup
   redirect('/login');
