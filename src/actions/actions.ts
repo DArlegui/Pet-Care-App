@@ -14,14 +14,21 @@ import { redirect } from 'next/navigation';
 export async function logIn(prevState: unknown, formData: unknown) {
   await sleep(1000);
 
-  //Check if formData is a FormData type
   if (!(formData instanceof FormData)) {
     return { message: 'Invalid form data' };
   }
 
   try {
-    //Validates through auth.ts
-    await signIn('credentials', formData);
+    // Validates through auth.ts, adding callbackUrl for redirection
+    const result = await signIn('credentials', {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      redirect: false, // avoid automatic redirect
+      // callbackUrl: '/dashboard', // explicitly redirect to dashboard
+    });
+
+    // After successful login, programmatically redirect to the correct page
+    if (result) redirect('/dashboard');
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -31,11 +38,8 @@ export async function logIn(prevState: unknown, formData: unknown) {
           return { message: 'An error occurred' };
       }
     }
-
-    return { message: 'An error occurred' };
+    throw error;
   }
-
-  redirect('/dashboard');
 }
 
 export async function signUp(prevState: unknown, formData: unknown) {

@@ -61,8 +61,8 @@ const config = {
         return true;
       }
 
-      if (isLoggedIn && !isTryingToAccessApp && isTryingToAccessPublic) {
-        return Response.redirect(new URL('/dashboard', request.nextUrl.origin).toString());
+      if (isLoggedIn && !isTryingToAccessApp) {
+        return Response.redirect(new URL('/dashboard', request.nextUrl));
       }
 
       return true;

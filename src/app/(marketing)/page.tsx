@@ -27,7 +27,9 @@ export default function Home() {
           <Button className="bg-emerald-600">
             <Link href="/signup">Get Started</Link>
           </Button>
-          <Button variant="secondary">Log In</Button>
+          <Button variant="secondary">
+            <Link href="/login">Log in</Link>
+          </Button>
         </div>
       </div>
     </main>
