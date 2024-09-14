@@ -14,7 +14,7 @@ const userData: Prisma.UserCreateInput = {
       {
         name: 'Buddy',
         ownerName: 'Elon Musk',
-        imageUrl: 'https://images.unsplash.com/photo-1568572933382-0d3b3f7e6b2d',
+        imageUrl: 'https://images.unsplash.com/photo-1558788353-f76d92427f16',
         age: 4,
         notes: 'Loves to play fetch',
         createdAt: new Date(),
@@ -32,7 +32,7 @@ const userData: Prisma.UserCreateInput = {
       {
         name: 'Bella',
         ownerName: 'Bill Gates',
-        imageUrl: 'https://images.unsplash.com/photo-1598136498121-0cc7b3b1b2e3',
+        imageUrl: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d',
         age: 3,
         notes: 'Very friendly and loves kids',
         createdAt: new Date(),
