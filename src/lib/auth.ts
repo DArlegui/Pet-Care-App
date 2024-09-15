@@ -13,28 +13,27 @@ const config = {
       async authorize(credentials) {
         // runs on login
 
-        //validations
+        // validation
         const validatedFormData = authSchema.safeParse(credentials);
-        if (!validatedFormData.success) return null;
+        if (!validatedFormData.success) {
+          return null;
+        }
 
         // extract values
         const { email, password } = validatedFormData.data;
 
         const user = await getUserByEmail(email);
-
         if (!user) {
-          console.log('User not found');
+          console.log('No user found');
           return null;
         }
 
         const passwordsMatch = await bcrypt.compare(password, user.password);
-
         if (!passwordsMatch) {
           console.log('Invalid credentials');
           return null;
         }
 
-        console.log('User found');
         return user;
       },
     }),
@@ -43,6 +42,7 @@ const config = {
     authorized: ({ auth, request }) => {
       // runs on every request with middleware
       const isLoggedIn = Boolean(auth?.user);
+
       const appPaths = ['/dashboard', '/account'];
       const publicPaths = ['/signup', '/login'];
 
@@ -57,12 +57,16 @@ const config = {
         return true;
       }
 
-      if (!isLoggedIn && isTryingToAccessPublic) {
+      if (isLoggedIn && !isTryingToAccessApp) {
+        if (request.nextUrl.pathname.includes('login') || request.nextUrl.pathname.includes('signup')) {
+          return Response.redirect(new URL('/payment', request.nextUrl));
+        }
+
         return true;
       }
 
-      if (isLoggedIn && !isTryingToAccessApp) {
-        return Response.redirect(new URL('/dashboard', request.nextUrl));
+      if (!isLoggedIn && isTryingToAccessPublic) {
+        return true;
       }
 
       return true;

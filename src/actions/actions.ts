@@ -6,9 +6,15 @@ import { sleep } from '@/lib/utils';
 import { authSchema, petFormSchema, petIdSchema } from '@/lib/validations';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import Stripe from 'stripe'; //Stripe Type
+
+dotenv.config();
+
+const stripe: Stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 // -- User Actions --
 export async function logIn(prevState: unknown, formData: unknown) {
@@ -28,7 +34,7 @@ export async function logIn(prevState: unknown, formData: unknown) {
     });
 
     // After successful login, programmatically redirect to the correct page
-    if (result) redirect('/dashboard');
+    if (result) redirect('/payment');
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -184,4 +190,27 @@ export async function deletePet(petId: unknown) {
   }
 
   revalidatePath('/app', 'layout');
+}
+
+// ---- payment actions ----
+export async function createCheckoutSession() {
+  //authenticates the user
+  const session = await checkAuth();
+
+  const checkoutSession = await stripe.checkout.sessions.create({
+    customer_email: session.user.email,
+    line_items: [
+      {
+        price: process.env.STRIPE_PRICE_ID,
+        quantity: 1,
+      },
+    ],
+    mode: 'payment',
+    success_url: `${process.env.CANONICAL_URL}/payment?success=true`,
+    cancel_url: `${process.env.CANONICAL_URL}/payment?cancelled=true`,
+  });
+
+  if (!checkoutSession) return null;
+
+  redirect(checkoutSession.url!);
 }
